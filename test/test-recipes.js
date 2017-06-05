@@ -36,7 +36,7 @@ describe('Recipes', function() {
 	});
 
 	it('should add an item on POST', function() {
-    const newItem = {name: 'PopCorn', ingredients: ['1 cup of popcorn kernals', 'pat of butter']};
+    const newItem = {name: 'Popcorn', ingredients: ['1 cup of popcorn kernals', 'pat of butter']};
     return chai.request(app)
       .post('/recipes')
       .send(newItem)
@@ -52,5 +52,40 @@ describe('Recipes', function() {
       });
   });
 
+	it('should update recipes on PUT', function() {
+
+    const updateData = {
+      name: 'foo',
+      ingredients: ['bizz', 'bang']
+    };
+
+    return chai.request(app)
+      // first have to get recipes so have `id` for one we
+      // want to update. Note that once we're working with databases later
+      // in this course get the `id` of an existing instance from the database,
+      // which will allow us to isolate the PUT logic under test from our
+      // GET interface.
+      .get('/recipes')
+      .then(function(res) {
+        updateData.id = res.body[0].id;
+
+        return chai.request(app)
+          .put(`/recipes/${updateData.id}`)
+          .send(updateData)
+      })
+      .then(function(res) {
+        res.should.have.status(200);
+        res.body.should.be.a('object');
+        res.body.should.include.keys('id', 'name', 'ingredients');
+        res.body.name.should.equal(updateData.name);
+        res.body.id.should.equal(updateData.id);
+        res.body.ingredients.should.include.members(updateData.ingredients);
+      });
+  });
 
 });
+
+
+
+
+
