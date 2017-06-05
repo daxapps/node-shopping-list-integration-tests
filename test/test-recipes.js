@@ -83,6 +83,20 @@ describe('Recipes', function() {
       });
   });
 
+  it('should delete items on DELETE', function() {
+    return chai.request(app)
+      // first have to get so we have an `id` of item
+      // to delete
+      .get('/recipes')
+      .then(function(res) {
+        return chai.request(app)
+          .delete(`/recipes/${res.body[0].id}`);
+      })
+      .then(function(res) {
+        res.should.have.status(204);
+      });
+  });
+
 });
 
 
